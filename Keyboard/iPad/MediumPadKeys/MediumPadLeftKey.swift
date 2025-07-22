@@ -1,10 +1,9 @@
 import SwiftUI
 import CommonExtensions
+import CoreIME
 
-struct MediumPadTransformKey: View {
+struct MediumPadLeftKey: View {
 
-        let destination: KeyboardForm
-        let keyLocale: HorizontalEdge
         let widthUnitTimes: CGFloat
 
         @EnvironmentObject private var context: KeyboardViewController
@@ -25,12 +24,23 @@ struct MediumPadTransformKey: View {
                                 .shadow(color: .shadowGray, radius: 0.5, y: 0.5)
                                 .padding(.vertical, verticalPadding)
                                 .padding(.horizontal, horizontalPadding)
-                        ZStack(alignment: keyLocale.isLeading ? .bottomLeading : .bottomTrailing) {
-                                Color.clear
-                                Text(verbatim: destination.padTransformKeyText).font(.subheadline)
+                        if context.inputStage.isBuffering {
+                                ZStack(alignment: .bottom) {
+                                        Color.clear
+                                        Text(verbatim: PresetConstant.separate)
+                                                .font(.keyFootnote)
+                                                .shallow()
+                                }
+                                .padding(.vertical, verticalPadding + 5)
+                                Text(verbatim: String.separator)
+                        } else {
+                                ZStack(alignment: .bottomLeading) {
+                                        Color.clear
+                                        Text(verbatim: KeyboardForm.numeric.padTransformKeyText).font(.subheadline)
+                                }
+                                .padding(.vertical, verticalPadding + 5)
+                                .padding(.horizontal, horizontalPadding + 5)
                         }
-                        .padding(.vertical, verticalPadding + 5)
-                        .padding(.horizontal, horizontalPadding + 5)
                 }
                 .frame(width: keyWidth, height: keyHeight)
                 .contentShape(Rectangle())
@@ -42,8 +52,12 @@ struct MediumPadTransformKey: View {
                                 }
                         }
                         .onEnded { _ in
-                                context.updateKeyboardForm(to: destination)
-                         }
+                                if context.inputStage.isBuffering {
+                                        context.handle(.apostrophe)
+                                } else {
+                                        context.updateKeyboardForm(to: .numeric)
+                                }
+                        }
                 )
         }
 }

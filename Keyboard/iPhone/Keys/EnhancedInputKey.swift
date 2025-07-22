@@ -2,14 +2,11 @@ import SwiftUI
 import CommonExtensions
 import CoreIME
 
-typealias EnhancedInputKey = ExpansibleInputKey
+struct EnhancedInputKey: View {
 
-// TODO: Rename to EnhancedInputKey
-struct ExpansibleInputKey: View {
-
-        /// Create an ExpansibleInputKey
+        /// Create an EnhancedInputKey
         /// - Parameters:
-        ///   - keyLocale: Key location, left half (leading) or right half (trailing).
+        ///   - keyLocale: Key location, left half screen (leading) or right half screen (trailing).
         ///   - widthUnitTimes: Times of widthUnit
         ///   - event: InputEvent
         ///   - keyModel: KeyModel
@@ -206,7 +203,7 @@ struct ExpansibleInputKey: View {
                                         let text: String = context.keyboardCase.isLowercased ? pulledText : pulledText.uppercased()
                                         context.operate(.process(text))
                                 } else if let event {
-                                        context.process(event, isCapitalized: context.keyboardCase.isCapitalized)
+                                        context.handle(event)
                                 } else {
                                         let text: String = context.keyboardCase.isLowercased ? keyModel.primary.text : keyModel.primary.text.uppercased()
                                         context.operate(.process(text))

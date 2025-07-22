@@ -7,22 +7,12 @@ extension StringProtocol {
                 guard codes.count == count else { return nil }
                 return codes.radix100Combined()
         }
-        var tenKeyCharCode: Int? {
-                guard count < 19 else { return nil }
-                let codes: [Int] = compactMap(\.tenKeyInterCode)
-                guard codes.count == count else { return nil }
-                return codes.decimalCombined()
-        }
 }
 
 extension RandomAccessCollection where Element == Int {
         func radix100Combined() -> Int {
                 guard count < 10 else { return 0 }
                 return reduce(0, { $0 * 100 + $1 })
-        }
-        func decimalCombined() -> Int {
-                guard count < 19 else { return 0 }
-                return reduce(0, { $0 * 10 + $1 })
         }
 }
 
@@ -57,38 +47,6 @@ private extension Character {
                 letterX : 43,
                 letterY : 44,
                 letterZ : 45,
-        ]
-
-        var tenKeyInterCode: Int? {
-                return Self.tenKeyCodeMap[self]
-        }
-        private static let tenKeyCodeMap: [Character : Int] = [
-                letterA : 2,
-                letterB : 2,
-                letterC : 2,
-                letterD : 3,
-                letterE : 3,
-                letterF : 3,
-                letterG : 4,
-                letterH : 4,
-                letterI : 4,
-                letterJ : 5,
-                letterK : 5,
-                letterL : 5,
-                letterM : 6,
-                letterN : 6,
-                letterO : 6,
-                letterP : 7,
-                letterQ : 7,
-                letterR : 7,
-                letterS : 7,
-                letterT : 8,
-                letterU : 8,
-                letterV : 8,
-                letterW : 9,
-                letterX : 9,
-                letterY : 9,
-                letterZ : 9,
         ]
 }
 

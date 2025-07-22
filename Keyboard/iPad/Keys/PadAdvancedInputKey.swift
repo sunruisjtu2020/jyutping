@@ -2,12 +2,10 @@ import SwiftUI
 import CommonExtensions
 import CoreIME
 
-// TODO: Rename to PadAdvancedInputKey
-
 /// Pullable & Expansible
-struct PadCompleteInputKey: View {
+struct PadAdvancedInputKey: View {
 
-        /// Create a PadCompleteInputKey
+        /// Create a PadAdvancedInputKey
         /// - Parameters:
         ///   - keyLocale: Key location, left half (leading) or right half (trailing).
         ///   - event: InputEvent
@@ -223,7 +221,7 @@ struct PadCompleteInputKey: View {
                                         context.operate(.process(text))
                                         isPullingDown = false
                                 } else if let event {
-                                        context.process(event, isCapitalized: context.keyboardCase.isCapitalized)
+                                        context.handle(event)
                                 } else {
                                         let text: String = context.keyboardCase.isLowercased ? keyModel.primary.text : keyModel.primary.text.uppercased()
                                         context.operate(.process(text))

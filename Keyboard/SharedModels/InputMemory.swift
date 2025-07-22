@@ -34,7 +34,7 @@ struct InputMemory {
                         fetchLegacy(lower: 0, upper: 1).forEach(migrate(_:))
                         missionAccomplished()
                 default:
-                        fetchLegacy(lower: 20, upper: 50_000).forEach(migrate(_:))
+                        fetchLegacy(lower: 20, upper: 10_0000).forEach(migrate(_:))
                         UserDefaults.standard.set(20, forKey: kInputMemoryVersion)
 
                         fetchLegacy(lower: 5, upper: 20).forEach(migrate(_:))
@@ -368,12 +368,10 @@ struct InputMemory {
         // MARK: - TenKey Suggestions
 
         static func tenKeySuggest(combos: [Combo]) async -> [Candidate] {
-                return tenKeyPingMatch(combos) + tenKeyAnchorsMatch(combos)
-        }
-        private static func tenKeyAnchorsMatch(_ combos: [Combo]) -> [Candidate] {
-                let code = combos.map(\.rawValue).decimalCombined()
-                guard code > 0 else { return [] }
-                let command: String = "SELECT word, romanization FROM memory WHERE tenkeyanchors = \(code) ORDER BY frequency DESC LIMIT 5;"
+                let inputLength: Int = combos.count
+                guard inputLength < 19 else { return [] }
+                let code: Int = combos.map(\.rawValue).decimalCombined()
+                let command: String = "SELECT word, romanization FROM memory WHERE tenkeycode = \(code) OR tenkeyanchors = \(code) ORDER BY frequency DESC LIMIT 6;"
                 var statement: OpaquePointer? = nil
                 defer { sqlite3_finalize(statement) }
                 guard sqlite3_prepare_v2(database, command, -1, &statement, nil) == SQLITE_OK else { return [] }
@@ -382,26 +380,11 @@ struct InputMemory {
                         guard let word = sqlite3_column_text(statement, 0) else { continue }
                         guard let romanizationText = sqlite3_column_text(statement, 1) else { continue }
                         let romanization: String = String(cString: romanizationText)
-                        let anchorText = String(romanization.split(separator: Character.space).compactMap(\.first))
-                        let instance = Candidate(text: String(cString: word), romanization: romanization, input: anchorText, mark: anchorText, order: -1)
-                        candidates.append(instance)
-                }
-                return candidates
-        }
-        private static func tenKeyPingMatch(_ combos: [Combo]) -> [Candidate] {
-                let code = combos.map(\.rawValue).decimalCombined()
-                guard code > 0 else { return [] }
-                let command: String = "SELECT word, romanization FROM memory WHERE tenkeycode = \(code) ORDER BY frequency DESC LIMIT 5;"
-                var statement: OpaquePointer? = nil
-                defer { sqlite3_finalize(statement) }
-                guard sqlite3_prepare_v2(database, command, -1, &statement, nil) == SQLITE_OK else { return [] }
-                var candidates: [Candidate] = []
-                while sqlite3_step(statement) == SQLITE_ROW {
-                        guard let word = sqlite3_column_text(statement, 0) else { continue }
-                        guard let romanizationText = sqlite3_column_text(statement, 1) else { continue }
-                        let romanization: String = String(cString: romanizationText)
-                        let input: String = romanization.filter(\.isLowercaseBasicLatinLetter)
-                        let mark: String = romanization.removedTones()
+                        let letterText: String = romanization.filter(\.isLowercaseBasicLatinLetter)
+                        let isFullMatched: Bool = (letterText.count == inputLength)
+                        lazy var anchorText: String = String(romanization.split(separator: Character.space).compactMap(\.first))
+                        let input: String = isFullMatched ? letterText : anchorText
+                        let mark: String = isFullMatched ? romanization.removedTones() : anchorText
                         let instance = Candidate(text: String(cString: word), romanization: romanization, input: input, mark: mark, order: -1)
                         candidates.append(instance)
                 }
@@ -432,6 +415,6 @@ private struct InternalLexicon: Hashable, Comparable {
 private extension Candidate {
         /// MemoryLexicon identifier
         var identifier: Int {
-                return (lexiconText + "." + romanization).hash
+                return (lexiconText + String.period + romanization).hash
         }
 }

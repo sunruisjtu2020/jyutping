@@ -18,7 +18,8 @@ struct GeneralPreferencesView: View {
         @State private var isLabelLastZero: Bool = AppSettings.isLabelLastZero
 
         @State private var characterStandard: CharacterStandard = Options.characterStandard
-        @State private var isEmojiSuggestionsOn: Bool = Options.isEmojiSuggestionsOn
+        @State private var isEmojiSuggestionsOn: Bool = AppSettings.isEmojiSuggestionsOn
+        @State private var isTextReplacementsOn: Bool = AppSettings.isTextReplacementsOn
         @State private var isCompatibleModeOn: Bool = AppSettings.isCompatibleModeOn
         @State private var isInputMemoryOn: Bool = AppSettings.isInputMemoryOn
 
@@ -162,7 +163,16 @@ struct GeneralPreferencesView: View {
                                                                 .toggleStyle(.switch)
                                                                 .fixedSize()
                                                                 .onChange(of: isEmojiSuggestionsOn) { newState in
-                                                                        Options.updateEmojiSuggestions(to: newState)
+                                                                        AppSettings.updateEmojiSuggestions(to: newState)
+                                                                }
+                                                        Spacer()
+                                                }
+                                                HStack {
+                                                        Toggle("GeneralPreferencesView.SystemLexicon.ToggleTitle", isOn: $isTextReplacementsOn)
+                                                                .toggleStyle(.switch)
+                                                                .fixedSize()
+                                                                .onChange(of: isTextReplacementsOn) { newState in
+                                                                        AppSettings.updateTextReplacementsState(to: newState)
                                                                 }
                                                         Spacer()
                                                 }
@@ -209,7 +219,7 @@ struct GeneralPreferencesView: View {
                                                         Button("GeneralPreferencesView.InputMemory.Clear.ConfirmationDialog.Confirm", role: .destructive) {
                                                                 clearInputMemoryProgress = 0
                                                                 isPerformingClearInputMemory = true
-                                                                UserLexicon.deleteAll()
+                                                                InputMemory.deleteAll()
                                                         }
                                                         Button("GeneralPreferencesView.InputMemory.Clear.ConfirmationDialog.Cancel", role: .cancel) {
                                                                 isClearInputMemoryConfirmDialogPresented = false

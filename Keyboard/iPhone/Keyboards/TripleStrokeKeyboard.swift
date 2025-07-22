@@ -90,7 +90,7 @@ private struct FirstKeyRow: View {
                         LetterInputKey(.letterE)
                         EnhancedInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("oe", footer: "eo"), members: [KeyElement("oe"), KeyElement("r"), KeyElement("eo")]))
                         LetterInputKey(.letterT)
-                        ExpansibleInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("yu"), members: [KeyElement("yu"), KeyElement("y")]))
+                        EnhancedInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("yu"), members: [KeyElement("yu"), KeyElement("y")]))
                         LetterInputKey(.letterU)
                         LetterInputKey(.letterI)
                         LetterInputKey(.letterO)
@@ -104,9 +104,9 @@ private struct FirstEnhancedKeyRow: View {
                         EnhancedInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("aa", header: "1"), members: [KeyElement("aa"), KeyElement("1"), KeyElement("q")]))
                         EnhancedInputKey(keyLocale: .leading, event: .letterW, keyModel: KeyModel(primary: KeyElement("w", header: "2"), members: [KeyElement("w"), KeyElement("2")]))
                         EnhancedInputKey(keyLocale: .leading, event: .letterE, keyModel: KeyModel(primary: KeyElement("e", header: "3"), members: [KeyElement("e"), KeyElement("3")]))
-                        ExpansibleInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("oe", header: "4", footer: "eo"), members: [KeyElement("oe"), KeyElement("4"), KeyElement("r"), KeyElement("eo")]))
+                        EnhancedInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("oe", header: "4", footer: "eo"), members: [KeyElement("oe"), KeyElement("4"), KeyElement("r"), KeyElement("eo")]))
                         EnhancedInputKey(keyLocale: .leading, event: .letterT, keyModel: KeyModel(primary: KeyElement("t", header: "5"), members: [KeyElement("t"), KeyElement("5")]))
-                        ExpansibleInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("yu", header: "6"), members: [KeyElement("yu"), KeyElement("6"), KeyElement("y")]))
+                        EnhancedInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("yu", header: "6"), members: [KeyElement("yu"), KeyElement("6"), KeyElement("y")]))
                         EnhancedInputKey(keyLocale: .trailing, event: .letterU, keyModel: KeyModel(primary: KeyElement("u", header: "7"), members: [KeyElement("u"), KeyElement("7")]))
                         EnhancedInputKey(keyLocale: .trailing, event: .letterI, keyModel: KeyModel(primary: KeyElement("i", header: "8"), members: [KeyElement("i"), KeyElement("8")]))
                         EnhancedInputKey(keyLocale: .trailing, event: .letterO, keyModel: KeyModel(primary: KeyElement("o", header: "9"), members: [KeyElement("o"), KeyElement("9")]))
@@ -183,7 +183,7 @@ private struct ThirdKeyRow: View {
                         EnhancedInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("ng"), members: [KeyElement("ng"), KeyElement("v")]))
                         LetterInputKey(.letterB)
                         LetterInputKey(.letterN)
-                        EnhancedInputKey(keyLocale: .trailing, event: .letterM, keyModel: KeyModel(primary: KeyElement("m"), members: [KeyElement("m"), KeyElement("kw")]))
+                        LetterInputKey(.letterM)
                 }
         }
 }
@@ -208,7 +208,7 @@ private struct ThirdEnhancedKeyRow: View {
                         EnhancedInputKey(keyLocale: .leading, keyModel: KeyModel(primary: KeyElement("ng", header: "…"), members: [KeyElement("ng"), KeyElement("…"), KeyElement("v")]))
                         EnhancedInputKey(keyLocale: .leading, event: .letterB, keyModel: KeyModel(primary: KeyElement("b", header: "、"), members: [KeyElement("b"), KeyElement("、")]))
                         EnhancedInputKey(keyLocale: .trailing, event: .letterN, keyModel: KeyModel(primary: KeyElement("n", header: "；"), members: [KeyElement("n"), KeyElement("；")]))
-                        EnhancedInputKey(keyLocale: .trailing, event: .letterM, keyModel: KeyModel(primary: KeyElement("m", header: "："), members: [KeyElement("m"), KeyElement("："), KeyElement("kw")]))
+                        EnhancedInputKey(keyLocale: .trailing, event: .letterM, keyModel: KeyModel(primary: KeyElement("m", header: "："), members: [KeyElement("m"), KeyElement("：")]))
                 }
         }
 }

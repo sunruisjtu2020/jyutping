@@ -27,13 +27,16 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                 ])
                 motherBoard.view.backgroundColor = view.backgroundColor
                 isKeyboardPrepared = true
+                Task {
+                        await obtainSupplementaryLexicon()
+                }
         }
         override func viewDidLoad() {
                 super.viewDidLoad()
                 if isKeyboardPrepared {
                         // do something
                 } else {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [unowned self] in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [unowned self] in
                                 prepareKeyboard()
                         }
                 }
@@ -228,7 +231,7 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                         textDocumentProxy.insertText(text)
                         return
                 }
-                let shouldAppendEvent: Bool = event.isLetter || (inputStage.isBuffering && (event.isToneNumber || event.isQuote))
+                let shouldAppendEvent: Bool = event.isLetter || (inputStage.isBuffering && (event.isToneNumber || event.isApostrophe))
                 guard shouldAppendEvent else {
                         if inputStage.isBuffering {
                                 inputBufferText(followedBy: text)
@@ -241,30 +244,7 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                 inputLengthSequence.append(1)
                 bufferEvents.append(event)
         }
-        func process(_ event: InputEvent, isCapitalized: Bool) {
-                defer {
-                        adjustKeyboard()
-                }
-                lazy var text: String = isCapitalized ? event.text.uppercased() : event.text
-                let isCantoneseComposeMode: Bool = inputMethodMode.isCantonese && keyboardForm.isBufferrable
-                guard isCantoneseComposeMode else {
-                        textDocumentProxy.insertText(text)
-                        return
-                }
-                let shouldAppendEvent: Bool = event.isLetter || (inputStage.isBuffering && (event.isToneNumber || event.isQuote))
-                guard shouldAppendEvent else {
-                        if inputStage.isBuffering {
-                                inputBufferText(followedBy: text)
-                        } else {
-                                textDocumentProxy.insertText(text)
-                        }
-                        return
-                }
-                capitals.append(isCapitalized)
-                inputLengthSequence.append(1)
-                bufferEvents.append(event)
-        }
-        func process(events: [InputEvent], isCapitalized: Bool) {
+        private func process(events: [InputEvent], isCapitalized: Bool) {
                 guard let firstEvent = events.first else { return }
                 defer {
                         adjustKeyboard()
@@ -275,7 +255,7 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                         textDocumentProxy.insertText(text)
                         return
                 }
-                let shouldAppendEvent: Bool = firstEvent.isLetter || (inputStage.isBuffering && (firstEvent.isToneNumber || firstEvent.isQuote))
+                let shouldAppendEvent: Bool = firstEvent.isLetter || (inputStage.isBuffering && (firstEvent.isToneNumber || firstEvent.isApostrophe))
                 guard shouldAppendEvent else {
                         if inputStage.isBuffering {
                                 inputBufferText(followedBy: text)
@@ -298,7 +278,7 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                 let events = text.lowercased().compactMap(InputEvent.matchInputEvent(for:))
                 switch events.count {
                 case 0: return
-                case 1: events.first.flatMap({ process($0, isCapitalized: isCapitalized) })
+                case 1: events.first.flatMap({ handle($0, isCapitalized: isCapitalized) })
                 default: process(events: events, isCapitalized: isCapitalized)
                 }
         }
@@ -382,9 +362,6 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                 switch operation {
                 case .input(let text):
                         textDocumentProxy.insertText(text)
-                        adjustKeyboard()
-                case .separate:
-                        process(.quote, isCapitalized: false)
                         adjustKeyboard()
                 case .process(let text):
                         let isCantoneseComposeMode: Bool = inputMethodMode.isCantonese && keyboardForm.isBufferrable
@@ -565,7 +542,7 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                         case .some(let event) where event.isReverseLookupTrigger:
                                 selectedCandidates = []
                                 var tail = bufferEvents.dropFirst(candidate.inputCount + 1)
-                                while (tail.first?.isQuote ?? false) {
+                                while (tail.first?.isApostrophe ?? false) {
                                         tail = tail.dropFirst()
                                 }
                                 let tailLength = tail.count
@@ -583,7 +560,7 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                                         selectedCandidates = []
                                 }
                                 var tail = bufferEvents.dropFirst(candidate.inputCount)
-                                while (tail.first?.isQuote ?? false) {
+                                while (tail.first?.isApostrophe ?? false) {
                                         tail = tail.dropFirst()
                                 }
                                 let tailLength = tail.count
@@ -666,6 +643,7 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                         async let memoryCandidates: [Candidate] = isInputMemoryOn ? InputMemory.suggest(events: bufferEvents, segmentation: segmentation) : []
                         async let engineCandidates: [Candidate] = Engine.suggest(events: bufferEvents, segmentation: segmentation)
                         let suggestions = await (memoryCandidates + engineCandidates).transformed(with: Options.characterStandard, isEmojiSuggestionsOn: isEmojiSuggestionsOn)
+                        let definedCandidates: [Candidate] = await searchDefinedCandidates(for: bufferEvents)
                         if Task.isCancelled.negative {
                                 await MainActor.run { [weak self] in
                                         guard let self else { return }
@@ -680,7 +658,7 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                                                 guard leadingLength < bufferEvents.count else { return bestScheme.mark }
                                                 return bestScheme.mark + String.space + text.dropFirst(leadingLength)
                                         }()
-                                        self.candidates = suggestions
+                                        self.candidates = definedCandidates.isEmpty ? suggestions : (definedCandidates + suggestions)
                                 }
                         }
                 }
@@ -773,6 +751,32 @@ final class KeyboardViewController: UIInputViewController, ObservableObject {
                 }
         }
         private lazy var tenKeyCachedCandidates: [Candidate] = []
+
+        private lazy var definedLexicons: [DefinedLexicon] = []
+        private func obtainSupplementaryLexicon() async {
+                let lexicon = await requestSupplementaryLexicon()
+                definedLexicons = lexicon.entries.compactMap({ entry -> DefinedLexicon? in
+                        let input = entry.userInput
+                        guard input.isNotEmpty else { return nil }
+                        let events = input.lowercased().compactMap(InputEvent.matchInputEvent(for:))
+                        guard events.count == input.count else { return nil }
+                        let text = entry.documentText
+                        guard text.isNotEmpty else { return nil }
+                        return DefinedLexicon(events: events, input: input, text: text)
+                })
+        }
+        private struct DefinedLexicon: Hashable {
+                let events: [InputEvent]
+                let input: String
+                let text: String
+        }
+        private func searchDefinedCandidates(for events: [InputEvent]) -> [Candidate] {
+                guard Options.isTextReplacementsOn else { return [] }
+                return definedLexicons.compactMap({ item -> Candidate? in
+                        guard item.events == events else { return nil }
+                        return Candidate(type: .text, text: item.text, romanization: item.input, input: item.input)
+                })
+        }
 
 
         // MARK: - Properties

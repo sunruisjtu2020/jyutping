@@ -1,5 +1,6 @@
 import SwiftUI
 import CommonExtensions
+import CoreIME
 
 struct PadRightKey: View {
 
@@ -7,27 +8,6 @@ struct PadRightKey: View {
 
         @EnvironmentObject private var context: KeyboardViewController
         @Environment(\.colorScheme) private var colorScheme
-
-        private var keyColor: Color {
-                switch colorScheme {
-                case .light:
-                        return .lightAction
-                case .dark:
-                        return .darkAction
-                @unknown default:
-                        return .lightAction
-                }
-        }
-        private var keyActiveColor: Color {
-                switch colorScheme {
-                case .light:
-                        return .activeLightAction
-                case .dark:
-                        return .activeDarkAction
-                @unknown default:
-                        return .activeLightAction
-                }
-        }
 
         @GestureState private var isTouching: Bool = false
 
@@ -40,7 +20,7 @@ struct PadRightKey: View {
                 ZStack {
                         Color.interactiveClear
                         RoundedRectangle(cornerRadius: PresetConstant.largeKeyCornerRadius, style: .continuous)
-                                .fill(isTouching ? keyActiveColor : keyColor)
+                                .fill(isTouching ? colorScheme.activeActionKeyColor : colorScheme.actionKeyColor)
                                 .shadow(color: .shadowGray, radius: 0.5, y: 0.5)
                                 .padding(.vertical, verticalPadding)
                                 .padding(.horizontal, horizontalPadding)
@@ -63,7 +43,7 @@ struct PadRightKey: View {
                         }
                         .onEnded { _ in
                                 if context.inputStage.isBuffering {
-                                        context.operate(.separate)
+                                        context.handle(.apostrophe)
                                 } else {
                                         context.updateKeyboardForm(to: .numeric)
                                 }
