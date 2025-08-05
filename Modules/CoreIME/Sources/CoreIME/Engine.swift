@@ -65,7 +65,7 @@ extension Engine {
                                 return anchorsMatch(events: events, statement: anchorsStatement)
                         }
                 default:
-                        return fetchTextMarks(text: events.map(\.text).joined()) + dispatch(events: events, segmentation: segmentation, anchorsStatement: anchorsStatement, pingStatement: pingStatement, strictStatement: strictStatement)
+                        return dispatch(events: events, segmentation: segmentation, anchorsStatement: anchorsStatement, pingStatement: pingStatement, strictStatement: strictStatement)
                 }
         }
 
@@ -209,7 +209,8 @@ extension Engine {
                                         }
                                         let isMatched = checks.reduce(true, { $0 && $1 })
                                         guard isMatched else { return nil }
-                                        let tail: [Character] = Array(repeating: "i", count: syllableCount - 1)
+                                        let separatorCount = syllableCount - 1
+                                        let tail: [Character] = Array(repeating: "i", count: separatorCount)
                                         let combinedInput: String = item.input + tail
                                         return item.replacedInput(with: combinedInput)
                                 }
@@ -480,7 +481,7 @@ extension Engine {
                         sqlite3_finalize(anchorsStatement)
                         sqlite3_finalize(codeMatchStatement)
                 }
-                return fetchTextMarks(combos: combos) + tenKeySearch(combos: combos, anchorsStatement: anchorsStatement, codeMatchStatement: codeMatchStatement)
+                return tenKeySearch(combos: combos, anchorsStatement: anchorsStatement, codeMatchStatement: codeMatchStatement)
         }
         private static func tenKeySearch<T: RandomAccessCollection<Combo>>(combos: T, limit: Int64? = nil, anchorsStatement: OpaquePointer?, codeMatchStatement: OpaquePointer?) -> [Candidate] {
                 let inputLength: Int = combos.count
@@ -513,6 +514,16 @@ extension Engine {
                 }
                 guard let firstInputCount = queried.first?.inputCount else { return [] }
                 guard firstInputCount < inputLength else { return queried }
+
+                let tailCombos = combos.dropFirst(firstInputCount)
+                let tailCode = tailCombos.map(\.rawValue).decimalCombined()
+                guard tailCode > 0 else { return queried }
+                let tailCandidates: [Candidate] = tenKeyCodeMatch(code: tailCode, limit: 20, statement: codeMatchStatement) + tenKeyAnchorsMatch(code: tailCode, limit: 20, statement: anchorsStatement)
+                guard tailCandidates.isNotEmpty, let head = queried.first else { return queried }
+                let concatenated = tailCandidates.compactMap({ head + $0 }).sorted().prefix(1)
+                return concatenated + queried
+
+                /*
                 let headInputLengths = queried.map(\.inputCount).uniqued()
                 let concatenated = headInputLengths.compactMap({ headLength -> Candidate? in
                         let tailEvents = combos.dropFirst(headLength)
@@ -521,6 +532,7 @@ extension Engine {
                         return headCandidate + tailCandidate
                 }).uniqued().sorted().prefix(1)
                 return concatenated + queried
+                */
         }
         private static func tenKeyAnchorsMatch(code: Int, limit: Int64? = nil, statement: OpaquePointer?) -> [Candidate] {
                 sqlite3_reset(statement)

@@ -7,8 +7,12 @@ struct GeneralSettingsView: View {
 
         @State private var pageSize: Int = AppSettings.displayCandidatePageSize
         @State private var lineSpacing: Int = AppSettings.candidateLineSpacing
-        private let pageSizeRange: Range<Int> = AppSettings.candidatePageSizeRange
-        private let lineSpacingRange: Range<Int> = AppSettings.candidateLineSpacingRange
+        @State private var pageCornerRadius: Int = AppSettings.pageCornerRadius
+        @State private var contentInsets: Int = AppSettings.contentInsets
+        @State private var innerCornerRadius: Int = AppSettings.innerCornerRadius
+        private let pageSizeRange: ClosedRange<Int> = AppSettings.candidatePageSizeRange
+        private let lineSpacingRange: ClosedRange<Int> = AppSettings.candidateLineSpacingRange
+        private let cornerRadiusRange: ClosedRange<Int> = AppSettings.cornerRadiusRange
 
         @State private var orientation: CandidatePageOrientation = AppSettings.candidatePageOrientation
         @State private var commentDisplayStyle: CommentDisplayStyle = AppSettings.commentDisplayStyle
@@ -50,6 +54,33 @@ struct GeneralSettingsView: View {
                                                 .pickerStyle(.menu)
                                                 .onChange(of: lineSpacing) { newLineSpacing in
                                                         AppSettings.updateCandidateLineSpacing(to: newLineSpacing)
+                                                }
+                                                Picker("GeneralPreferencesView.CandidatePageCornerRadius", selection: $pageCornerRadius) {
+                                                        ForEach(cornerRadiusRange, id: \.self) {
+                                                                Text(verbatim: "\($0) pt").tag($0)
+                                                        }
+                                                }
+                                                .pickerStyle(.menu)
+                                                .onChange(of: pageCornerRadius) { newValue in
+                                                        AppSettings.updatePageCornerRadius(to: newValue)
+                                                }
+                                                Picker("GeneralPreferencesView.CandidatePageInsets", selection: $contentInsets) {
+                                                        ForEach(cornerRadiusRange, id: \.self) {
+                                                                Text(verbatim: "\($0) pt").tag($0)
+                                                        }
+                                                }
+                                                .pickerStyle(.menu)
+                                                .onChange(of: contentInsets) { newValue in
+                                                        AppSettings.updateContentInsets(to: newValue)
+                                                }
+                                                Picker("GeneralPreferencesView.CandidateCornerRadius", selection: $innerCornerRadius) {
+                                                        ForEach(cornerRadiusRange, id: \.self) {
+                                                                Text(verbatim: "\($0) pt").tag($0)
+                                                        }
+                                                }
+                                                .pickerStyle(.menu)
+                                                .onChange(of: innerCornerRadius) { newValue in
+                                                        AppSettings.updateInnerCornerRadius(to: newValue)
                                                 }
                                         }
                                         Section {
@@ -184,8 +215,10 @@ struct GeneralSettingsView: View {
                                 }
                                 .formStyle(.grouped)
                                 .scrollContentBackground(.hidden)
+                                .background(Color.textBackgroundColor.opacity(0.75), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 .frame(maxWidth: 480)
                         }
+                        .padding(8)
                 }
                 .navigationTitle("GeneralPreferencesView.NavigationTitle.TitleKey")
         }

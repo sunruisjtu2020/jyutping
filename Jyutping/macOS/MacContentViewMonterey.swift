@@ -13,45 +13,45 @@ struct MacContentViewMonterey: View {
                         List {
                                 Section {
                                         NavigationLink {
-                                                MacInputMethodView().applyVisualEffect()
+                                                MacInputMethodView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.InstallInputMethod", systemImage: "sparkles")
                                         }
                                         NavigationLink {
-                                                MacIntroductionsView().applyVisualEffect()
+                                                MacIntroductionsView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.Introductions", systemImage: "book")
                                         }
                                         NavigationLink {
-                                                MacExpressionsView().applyVisualEffect()
+                                                MacExpressionsView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.CantoneseExpressions", systemImage: "checkmark.seal")
                                         }
                                         NavigationLink {
-                                                MacConfusionView().applyVisualEffect()
+                                                MacConfusionView()
                                         } label: {
-                                                Label("MacSidebar.NavigationTitle.SimplifiedCharacterConfusion", systemImage: "character")
+                                                Label("MacSidebar.NavigationTitle.SimplifiedCharacterConfusion", systemImage: "character.zh")
                                         }
                                 } header: {
                                         Text("MacSidebar.SectionHeader.InputMethod").textCase(nil).font(.copilot)
                                 }
                                 .font(.master)
                                 Section {
-                                        NavigationLink(destination: MacSearchView().applyVisualEffect(), isActive: $isMacSearchViewActive) {
+                                        NavigationLink(destination: MacSearchView(), isActive: $isMacSearchViewActive) {
                                                 Label("MacSidebar.NavigationTitle.Search", systemImage: "magnifyingglass")
                                         }
                                         NavigationLink {
-                                                MacJyutpingInitialTable().applyVisualEffect()
+                                                MacJyutpingInitialTable()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.JyutpingInitials", systemImage: "rectangle.leadingthird.inset.filled")
                                         }
                                         NavigationLink {
-                                                MacJyutpingFinalTable().applyVisualEffect()
+                                                MacJyutpingFinalTable()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.JyutpingFinals", systemImage: "rectangle.trailingthird.inset.filled")
                                         }
                                         NavigationLink {
-                                                MacJyutpingToneTable().applyVisualEffect()
+                                                MacJyutpingToneTable()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.JyutpingTones", systemImage: "bell")
                                         }
@@ -61,34 +61,34 @@ struct MacContentViewMonterey: View {
                                 .font(.master)
                                 Section {
                                         NavigationLink {
-                                                NumbersView().applyVisualEffect()
+                                                NumbersView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.Numbers", systemImage: "number")
                                         }
                                         NavigationLink {
-                                                StemsBranchesView().applyVisualEffect()
+                                                StemsBranchesView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.StemsAndBranches", systemImage: "timelapse")
                                         }
                                         NavigationLink {
-                                                ChineseZodiacView().applyVisualEffect()
+                                                ChineseZodiacView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.ChineseZodiac", systemImage: "hare")
                                         }
                                         NavigationLink {
-                                                SolarTermsView().applyVisualEffect()
+                                                SolarTermsView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.SolarTerms", systemImage: "cloud.sun")
                                         }
                                         NavigationLink {
-                                                MacHundredFamilySurnamesView().applyVisualEffect()
+                                                MacHundredFamilySurnamesView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.HundredFamilySurnames", systemImage: "person")
                                         }
                                         NavigationLink {
-                                                MacThousandCharacterClassicView().applyVisualEffect()
+                                                MacThousandCharacterClassicView()
                                         } label: {
-                                                Label("MacSidebar.NavigationTitle.ThousandCharacterClassic", systemImage: "character")
+                                                Label("MacSidebar.NavigationTitle.ThousandCharacterClassic", systemImage: "character.zh")
                                         }
                                 } header: {
                                         Text("MacSidebar.SectionHeader.Cantonese").textCase(nil).font(.copilot)
@@ -96,32 +96,32 @@ struct MacContentViewMonterey: View {
                                 .font(.master)
                                 Section {
                                         NavigationLink {
-                                                MacCantonMetroView().applyVisualEffect()
+                                                MacCantonMetroView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.CantonMetro", systemImage: "tram.circle")
                                         }
                                         NavigationLink {
-                                                MacFatshanMetroView().applyVisualEffect()
+                                                MacFatshanMetroView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.FatshanMetro", systemImage: "tram.circle")
                                         }
                                         NavigationLink {
-                                                MacMacauMetroView().applyVisualEffect()
+                                                MacMacauMetroView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.MacauMetro", systemImage: "tram.circle")
                                         }
                                         NavigationLink {
-                                                MacTungkunRailTransitView().applyVisualEffect()
+                                                MacTungkunRailTransitView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.TungkunRailTransit", systemImage: "tram.circle")
                                         }
                                         NavigationLink {
-                                                MacShamChunMetroView().applyVisualEffect()
+                                                MacShamChunMetroView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.ShamChunMetro", systemImage: "tram.circle")
                                         }
                                         NavigationLink {
-                                                MacHongKongMTRView().applyVisualEffect()
+                                                MacHongKongMTRView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.HongKongMTR", systemImage: "tram.circle")
                                         }
@@ -131,11 +131,11 @@ struct MacContentViewMonterey: View {
                                 .font(.master)
                                 Section {
                                         NavigationLink {
-                                                MacResourcesView().applyVisualEffect()
+                                                MacResourcesView()
                                         } label: {
                                                 Label("MacSidebar.NavigationTitle.Resources", systemImage: "globe.asia.australia")
                                         }
-                                        NavigationLink(destination: MacAboutView().applyVisualEffect(), isActive: $isMacAboutViewActive) {
+                                        NavigationLink(destination: MacAboutView(), isActive: $isMacAboutViewActive) {
                                                 Label("MacSidebar.NavigationTitle.About", systemImage: "info.circle")
                                         }
                                 } header: {
